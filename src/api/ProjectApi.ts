@@ -8,7 +8,7 @@ import { isAxiosError } from 'axios';
 
 export async function createProject(formData: ProjectFormData) {
   try {
-    const { data } = await api.post('/projects', formData);
+    const { data } = await api.post<string>('/projects', formData);
     return data;
   } catch (error) {
     if (isAxiosError(error) && error.response) {
@@ -50,6 +50,17 @@ type ProjectApiType = {
 export async function updateProject({ formData, projectId }: ProjectApiType) {
   try {
     const { data } = await api.put<string>(`/projects/${projectId}`, formData);
+    return data;
+  } catch (error) {
+    if (isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.error);
+    }
+  }
+}
+
+export async function deleteProject(id: Project['_id']) {
+  try {
+    const { data } = await api.delete<string>(`/projects/${id}`);
     return data;
   } catch (error) {
     if (isAxiosError(error) && error.response) {

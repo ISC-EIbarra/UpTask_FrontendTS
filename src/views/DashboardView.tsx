@@ -8,13 +8,27 @@ import {
 } from '@headlessui/react';
 import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { getProjects } from '@/api/ProjectApi';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteProject, getProjects } from '@/api/ProjectApi';
+import { toast } from 'react-toastify';
 
 export default function DashboardView() {
+  const queryClient = useQueryClient();
+
   const { data, isLoading } = useQuery({
     queryKey: ['projects'],
     queryFn: getProjects,
+  });
+
+  const { mutate } = useMutation({
+    mutationFn: deleteProject,
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSuccess: (data) => {
+      toast.success(data);
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+    },
   });
 
   if (isLoading) {
@@ -102,7 +116,9 @@ export default function DashboardView() {
                           <button
                             type="button"
                             className="block px-3 py-1 text-sm leading-6 text-red-500"
-                            onClick={() => {}}
+                            onClick={() => {
+                              mutate(project._id);
+                            }}
                           >
                             Eliminar Proyecto
                           </button>
@@ -116,7 +132,7 @@ export default function DashboardView() {
           </ul>
         ) : (
           <p className="text-center py-20">
-            No hay proyectos aún
+            No hay proyectos aún {''}
             <Link to="/projects/create" className="text-fuchsia-500 font-bold">
               Crear Proyecto
             </Link>
