@@ -62,7 +62,7 @@ export default function AddTaskModal() {
         <Dialog
           as="div"
           className="relative z-10"
-          onClose={() => navigate(location.pathname)}
+          onClose={() => navigate(location.pathname, { replace: true })}
         >
           <Transition.Child
             as={Fragment}
