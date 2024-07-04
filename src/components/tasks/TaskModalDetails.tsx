@@ -6,10 +6,12 @@ import {
   useNavigate,
   useParams,
 } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { getTaskById } from '@/api/TaskApi';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getTaskById, updateStatus } from '@/api/TaskApi';
 import { toast } from 'react-toastify';
 import { formatDate } from '@/utils/utils';
+import { statusTranslations } from '@/locales/es';
+import { TaskStatus } from '@/types/index';
 
 export default function TaskModalDetails() {
   const params = useParams();
@@ -27,6 +29,30 @@ export default function TaskModalDetails() {
     enabled: !!taskId,
     retry: false,
   });
+
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationFn: updateStatus,
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSuccess: (data) => {
+      toast.success(data);
+      queryClient.invalidateQueries({ queryKey: ['project', projectId] });
+      queryClient.invalidateQueries({ queryKey: ['task', taskId] });
+    },
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const status = e.target.value as TaskStatus;
+    const data = {
+      projectId,
+      taskId,
+      status,
+    };
+    mutate(data);
+  };
 
   if (isError) {
     toast.error(error.message, { toastId: 'error' });
@@ -83,6 +109,19 @@ export default function TaskModalDetails() {
                     </p>
                     <div className="my-5 space-y-3">
                       <label className="font-bold">Estado Actual:</label>
+                      <select
+                        className="w-full p-3 bg-white border border-gray-300"
+                        defaultValue={data.status}
+                        onChange={handleChange}
+                      >
+                        {Object.entries(statusTranslations).map(
+                          ([key, value]) => (
+                            <option key={key} value={key}>
+                              {value}
+                            </option>
+                          )
+                        )}
+                      </select>
                     </div>
                   </Dialog.Panel>
                 </Transition.Child>
