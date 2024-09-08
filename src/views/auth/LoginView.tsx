@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form';
 import { UserLoginForm } from '@/types/index';
 import { useMutation } from '@tanstack/react-query';
 import ErrorMessage from '@/components/ErrorMessage';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { authenticateUser } from '@/api/AuthApi';
 import { toast } from 'react-toastify';
 
@@ -17,6 +17,8 @@ export default function LoginView() {
     formState: { errors },
   } = useForm({ defaultValues: initialValues });
 
+  const navigate = useNavigate();
+
   const { mutate } = useMutation({
     mutationFn: authenticateUser,
     onError: (error) => {
@@ -24,6 +26,9 @@ export default function LoginView() {
     },
     onSuccess: () => {
       toast.success('Iniciando Sesión...');
+      setTimeout(() => {
+        navigate('/', { replace: true });
+      }, 3000);
     },
   });
 

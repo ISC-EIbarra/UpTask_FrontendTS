@@ -1,9 +1,9 @@
 import { Link, Navigate, Outlet } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import Logo from '@/components/Logo';
 import NavMenu from '@/components/NavMenu';
 import { useAuth } from '@/hooks/useAuth';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './toast.css';
 
 export default function AppLayout() {
