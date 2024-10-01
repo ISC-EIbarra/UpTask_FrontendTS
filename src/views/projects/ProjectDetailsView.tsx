@@ -3,10 +3,13 @@ import AddTaskModal from '@/components/tasks/AddTaskModal';
 import EditTaskData from '@/components/tasks/EditTaskData';
 import TaskList from '@/components/tasks/TaskList';
 import TaskModalDetails from '@/components/tasks/TaskModalDetails';
+import { useAuth } from '@/hooks/useAuth';
+import isManager from '@/utils/policies';
 import { useQuery } from '@tanstack/react-query';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 
 export default function ProjectDetailsView() {
+  const { data: user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const params = useParams();
   const projectId = params.projectId!;
@@ -16,17 +19,17 @@ export default function ProjectDetailsView() {
     queryFn: () => getProjectById(projectId),
   });
 
-  if (isLoading) return 'Cargando';
+  if (isLoading && authLoading) return 'Cargando';
   if (isError) return <Navigate to="/404" />;
 
-  if (data)
+  if (data && user)
     return (
       <>
         <h1 className="text-4xl font-black">{data.projectName}</h1>
         <p className="text-2xl font-light text-gray-500 mt-4">
           {data.description}
         </p>
-
+        {isManager(data.manager, user._id) && (
         <nav className="my-5 flex gap-3">
           <button
             type="button"
@@ -42,6 +45,7 @@ export default function ProjectDetailsView() {
             Colaboradores
           </Link>
         </nav>
+        )}
         <TaskList tasks={data.tasks} />
         <AddTaskModal />
         <EditTaskData />
