@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { getProjectById } from '@/api/ProjectApi';
+import { getProjectDetails } from '@/api/ProjectApi';
 import AddTaskModal from '@/components/tasks/AddTaskModal';
 import EditTaskData from '@/components/tasks/EditTaskData';
 import TaskList from '@/components/tasks/TaskList';
@@ -17,7 +17,7 @@ export default function ProjectDetailsView() {
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['project', projectId],
-    queryFn: () => getProjectById(projectId),
+    queryFn: () => getProjectDetails(projectId),
   });
 
   const canEdit = useMemo(() => data?.manager === user?._id, [data, user]);
